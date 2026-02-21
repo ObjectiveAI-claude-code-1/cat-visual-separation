@@ -1,0 +1,148 @@
+{
+  "type": "scalar.function",
+  "input_schema": {
+    "type": "object",
+    "description": "A photograph containing a cat to evaluate for visual separation from its surroundings.",
+    "properties": {
+      "photograph": {
+        "type": "image",
+        "description": "A photograph of a cat to evaluate. The image may come from any source — a professional studio session, a casual phone snapshot, an outdoor candid, a shelter listing, or a social media post. It should contain at least one cat as the intended subject."
+      }
+    },
+    "required": [
+      "photograph"
+    ]
+  },
+  "tasks": [
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "Look at this photograph of a cat. Focusing only on the difference in color and brightness between the cat's fur and the surfaces directly behind and beneath it, how easy is it to see where the cat ends and the background begins?"
+            },
+            {
+              "$jmespath": "input.photograph"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat's outline is immediately clear. There is strong contrast in color and tone between the cat's fur and its background — the silhouette is instantly readable and you can trace the boundary of the cat without any effort at all."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is somewhat distinguishable from its background, but the contrast is moderate. You can make out the cat's shape with a little effort, though certain edges blend where the colors or tones are close."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat nearly disappears into its background. The colors and tones of the cat's fur and the surrounding surfaces are so similar that the cat's form dissolves into the scene — it is very difficult to tell where the cat ends and the background begins."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "system",
+          "content": [
+            {
+              "type": "text",
+              "text": "You are a photography critic specializing in how visual textures and patterns interact within a photograph. You evaluate whether a subject's surface is distinct from or camouflaged by its surroundings."
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.photograph"
+            },
+            {
+              "type": "text",
+              "text": "Does the cat's coat blend into the patterns and textures of the surfaces around it in this photograph?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "Not at all. The cat's fur has a completely different visual texture and pattern from everything around it. Whether the coat is smooth, striped, or spotted, it reads as entirely distinct from the surfaces in the environment. There is no textural camouflage here."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Partially. There are noticeable similarities between the cat's coat pattern and the textures in its surroundings — the visual rhythms overlap enough to soften the distinction in places, though the cat remains identifiable as a separate subject."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Yes, heavily. The cat's fur pattern and the textures around it are so similar in scale and rhythm that the cat appears embedded in the scene's fabric. The coat and the environment share a visual frequency that makes the cat feel like part of the texture rather than a distinct subject sitting atop it."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "If you glanced at this photograph for just one second, what would grab your attention first and why?"
+            },
+            {
+              "$jmespath": "input.photograph"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The cat, without question. It is the undeniable focal point of the image. The scene around it is calm and uncluttered — nothing else in the frame comes close to rivaling the cat for visual attention. Your eye goes straight to the cat and stays there."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Probably the cat, but a few other things also catch my eye. There are some elements in the scene — other objects, colors, or figures — that momentarily pull my attention away before I settle back on the cat. It holds the top of the visual hierarchy, but not unchallenged."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Something other than the cat. The scene is crowded with competing elements — bright objects, other animals or people, bold patterns, or vivid colors elsewhere in the frame — that overpower the cat and steal the viewer's gaze. The cat is demoted from subject to bystander in its own photograph."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    }
+  ],
+  "description": "Scores how visually distinct a cat is from its surroundings in a photograph. Evaluates tonal and color contrast against the background, pattern and texture distinction from nearby surfaces, and scene clarity free from competing elements. Scores high when the cat is immediately readable as the subject; low when camouflaged or visually overshadowed."
+}
